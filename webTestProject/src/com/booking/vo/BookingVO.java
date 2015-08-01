@@ -12,9 +12,15 @@ public class BookingVO {
 	private String  vehicle_code;         
 	private String  dp_date;          
 	private String  arrival_city;
-	 
+	private String  seat_type;
 	
 	
+	public String getSeat_type() {
+		return seat_type;
+	}
+	public void setSeat_type(String seat_type) {
+		this.seat_type = seat_type;
+	}
 	public String getArrival_time() {
 		return arrival_time;
 	}
@@ -81,6 +87,7 @@ public class BookingVO {
 	public void setArrival_city(String arrival_city) {
 		this.arrival_city = arrival_city;
 	}
+	
 	
 	
 	

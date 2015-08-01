@@ -4,6 +4,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+/*import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;*/
+
 
 import com.booking.vo.BookingVO;
 import com.util.DBConnectionMgr;
@@ -53,26 +57,38 @@ public class BusDao {
 	}
    	
    	
-   	//예매 체크 -미완 HashMap리턴으로 변경
-	public BookingVO bookingChack(int b_code, int d_code){
+   	//예매 체크
+	public BookingVO bookingChack(int d_code, int b_code){
 		StringBuffer sql = new StringBuffer();
-		sql.append("SELECT * FROM BOOKING_DETAILS ");
-		sql.append(" WHERE WHERE booking_dcode = ? ");
+		
+		sql.append("SELECT arrival_time, booking_price, booking_dcode, booking_age, booking_code, dp_date, ");
+	    sql.append("(SELECT TIME_TIME FROM TIMETABLE WHERE TIMETABLE.TIME_CODE = BOOKING_DETAILS.time_code)as TIME_CODE, ");
+	    sql.append("(SELECT SEAT_NUMBER FROM SEAT WHERE SEAT.SEAT_CODE = BOOKING_DETAILS.seat_code)as SEAT_CODE, ");
+	    sql.append("(SELECT SEAT_SEAT FROM SEAT WHERE SEAT.SEAT_CODE = BOOKING_DETAILS.seat_code)as SEAT_TYPE, ");
+	    sql.append("(SELECT city_city AS st_city FROM city WHERE city.city_code = BOOKING_DETAILS.start_city)as START_CITY, ");
+	    sql.append("(SELECT city_city AS ed_city FROM city WHERE city.city_code = BOOKING_DETAILS.arrival_city)as arrival_city, ");
+	    sql.append("(SELECT vehicle_kinds FROM vehicle WHERE vehicle.vehicle_code = BOOKING_DETAILS.vehicle_code)as VEHICLE_CODE ");
+	    sql.append("  FROM BOOKING_DETAILS ");
+		sql.append(" WHERE booking_dcode = ? ");
 		sql.append("   AND Booking_code = ? ");
 	    ResultSet rs = null;
-	    BookingVO bvo = new BookingVO();
-	    Connection	con = null;
+	    BookingVO bvo = new BookingVO(); 
+	    Connection con = null;
 		PreparedStatement pstmt = null;
 		try{
+			con	=dbMgr.getConnection();
 			pstmt = con.prepareStatement(sql.toString());
+			pstmt.setInt(1,d_code);
+			pstmt.setInt(2,b_code);
 			rs = pstmt.executeQuery();
-		  if(rs.next()){
+		  while(rs.next()){
 			  bvo.setArrival_time(rs.getString("ARRIVAL_TIME"));        
 			  bvo.setBooking_price(rs.getString("BOOKING_PRICE"));
 			  bvo.setBooking_dcode(rs.getInt("BOOKING_DCODE"));        
 			  bvo.setBooking_age(rs.getString("BOOKING_AGE"));       
 			  bvo.setBooking_code(rs.getInt("BOOKING_CODE"));       
 			  bvo.setSeat_code(rs.getString("SEAT_CODE"));    
+			  bvo.setSeat_type(rs.getString("SEAT_TYPE"));    
 			  bvo.setTime_code(rs.getString("TIME_CODE"));      
 			  bvo.setStart_city(rs.getString("START_CITY"));      
 			  bvo.setVehicle_code(rs.getString("VEHICLE_CODE"));      
@@ -81,9 +97,9 @@ public class BusDao {
 		  }
 		
 		}catch(SQLException se){
-			System.out.println("booking2 = [ "+se+" ]");
+			System.out.println("bookingchk32 = [ "+se+" ]");
 		}catch (Exception e){
-			System.out.println("booking2 = [ "+e+" ]");
+			System.out.println("bookingchk3 = [ "+e+" ]");
 		}
 	    
 	    return bvo;
@@ -127,5 +143,60 @@ public class BusDao {
 		}
 		return success;
 	}
+	/*//운송수단코드로 운송수단종류를 리턴
+	public String checkVehicle(String b_brice){
+		StringBuffer sql = new StringBuffer();
+		sql.append("SELECT VEHICLE_KINDS FROM VEHICLE ");
+		sql.append("WHERE VEHICLE_CODE = ? ");
+	    String vehicle = "";
+	    Connection	con = null;
+	    ResultSet rs = null;
+	    PreparedStatement pstmt = null;
+	    try{
+	    	con	= dbMgr.getConnection();
+	    	pstmt = con.prepareStatement(sql.toString());
+	    	pstmt.setString(1,b_brice);
+			rs = pstmt.executeQuery();
+			  if(rs.next()){
+				  vehicle = rs.getString("VEHICLE_KINDS");
+			  }
+			
+		}catch(SQLException se){
+			System.out.println("bookingBus = [ "+se+" ]");
+		}catch (Exception e){
+			System.out.println("bookingBus = [ "+e+" ]");
+	   
+    	}
+	    return vehicle;
+	}
+	//시트코드로 좌석과 좌석종류를 리턴
+	public  List<HashMap> checkSeat(String s_code){
+		
+		List<HashMap> boardList = new ArrayList<HashMap>();
+		StringBuffer sql = new StringBuffer();
+		sql.append("SELECT SEAT_NUMBER FROM SEAT ");
+		sql.append("WHERE SEAT_CODE = ? ");
+	    String vehicle = "";
+	    Connection	con = null;
+	    ResultSet rs = null;
+	    PreparedStatement pstmt = null;
+	    try{
+	    	con	= dbMgr.getConnection();
+	    	pstmt = con.prepareStatement(sql.toString());
+	    	pstmt.setString(1,s_code);
+			rs = pstmt.executeQuery();
+			  if(rs.next()){
+				  vehicle = rs.getString("SEAT_NUMBER");
+				  vehicle = rs.getString("SEAT_SEAT");
+			  }
+			
+		}catch(SQLException se){
+			System.out.println("bookingBus = [ "+se+" ]");
+		}catch (Exception e){
+			System.out.println("bookingBus = [ "+e+" ]");
+	   
+    	}
+	    return vehicle;
+	}*/
    	
 }
